@@ -5,7 +5,7 @@ class ClientAdd extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      item: {
+      items: {
         id: "",
         numero: "",
         telephone: ""
@@ -16,39 +16,36 @@ class ClientAdd extends React.Component {
     this.handletelephoneChange = this.handletelephoneChange.bind(this);
   }
 
+  componentDidMount() {
+    this.state.items.id = Math.floor(Math.random() * 13098792);
+  }
+
   handlenumeroChange(e) {
-    this.state.item.numero = e.target.value;
-    this.setState(this.state.item);
+    this.state.items.numero = e.target.value;
+    this.setState(this.state.items);
   }
   handletelephoneChange(e) {
-    this.state.item.telephone = e.target.value;
-    this.setState(this.state.item);
+    this.state.items.telephone = e.target.value;
+    this.setState(this.state.items);
+  }
+  clear() {
+    this.state.items.telephone = "";
+    this.state.items.numero = "";
+    this.state.items.id = Math.floor(Math.random() * 13098792);
+
+    this.setState(this.state.items);
   }
 
   onSubmit = (e) => {
     e.preventDefault();
-    // alert(JSON.stringify(this.state.item));
+    // alert(JSON.stringify(this.state.items));
+    let myLocalStorage2 =
+      JSON.parse(localStorage.getItem("chambre.json")) || [];
+    myLocalStorage2.push(this.state.items);
 
-    this.state.item.telephone = e.target.value;
+    localStorage.setItem("chambre.json", JSON.stringify(myLocalStorage2));
 
-    axios
-      .post(
-        "https://62055a81161670001741b9aa.mockapi.io/chambre",
-        this.state.item
-      )
-      .then((response) => {
-        console.log(response);
-        if (response.status == 201) {
-          this.state.checkForm = true;
-          this.setState(this.state);
-        }
-
-        console.log(this.state.checkForm);
-        // this.setState({ items: response.data });
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    this.clear();
   };
   render() {
     let divAlert = "";
@@ -63,7 +60,7 @@ class ClientAdd extends React.Component {
     return (
       <div id="container">
         <div>
-          <h3>Ajouter un Client</h3>
+          <h3>Ajouter une chambre</h3>
         </div>
         <form onSubmit={(e) => this.onSubmit(e)}>
           {divAlert}
@@ -80,7 +77,7 @@ class ClientAdd extends React.Component {
               id="numero"
               name="numero"
               placeholder="Numero de la chambre"
-              value={this.state.item.numero}
+              value={this.state.items.numero}
               onChange={this.handlenumeroChange}
             />
           </div>
@@ -92,7 +89,7 @@ class ClientAdd extends React.Component {
               id="telephone"
               name="telephone"
               placeholder="Entrer un telephone"
-              value={this.state.item.telephone}
+              value={this.state.items.telephone}
               onChange={this.handletelephoneChange}
             />
           </div>

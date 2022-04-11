@@ -1,7 +1,4 @@
 import React from "react";
-import axios from "axios";
-//import { Redirect } from "react-router-dom";
-// <Redirect to="/index" />
 
 class ClientEdit extends React.Component {
   constructor(props) {
@@ -17,23 +14,17 @@ class ClientEdit extends React.Component {
 
     this.handlenumeroChange = this.handlenumeroChange.bind(this);
     this.handletelephoneChange = this.handletelephoneChange.bind(this);
-    console.log(this.props.match.params.id);
-    console.log(this.props.match);
   }
 
   componentDidMount() {
-    axios
-      .get(
-        "https://62055a81161670001741b9aa.mockapi.io/chambre/" +
-          this.props.match.params.id
-      )
-      .then((response) => {
-        this.setState({ item: response.data });
-        console.log(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    let chambres = JSON.parse(localStorage.getItem("chambre.json"));
+    for (let i = 0; i < chambres.length; i++) {
+      const chambre = chambres[i];
+      if (chambre.id === parseInt(this.props.match.params.id, 10)) {
+        this.setState({ item: chambre });
+        break;
+      }
+    }
   }
 
   handlenumeroChange(e) {
@@ -46,27 +37,20 @@ class ClientEdit extends React.Component {
   }
   onSubmit = (e) => {
     e.preventDefault();
-    // alert(JSON.stringify(this.state.item));
 
-    axios
-      .put(
-        "https://62055a81161670001741b9aa.mockapi.io/chambre/" +
-          this.state.item.id,
-        this.state.item
-      )
-      .then((response) => {
-        console.log(response);
-        // this.setState({ items: response.data });
-        if (response.status == 200) {
-          this.state.checkForm = true;
-          this.setState(this.state);
-        }
+    let myLocalStorage2 =
+      JSON.parse(localStorage.getItem("chambre.json")) || [];
 
-        console.log(this.state.checkForm);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    for (let i = 0; i < myLocalStorage2.length; i++) {
+      const chambre = myLocalStorage2[i];
+      if (chambre.id === parseInt(this.props.match.params.id, 10)) {
+        this.state.checkForm = true;
+        myLocalStorage2.splice(i, 1, this.state.item);
+        break;
+      }
+    }
+    this.setState(this.state);
+    localStorage.setItem("chambre.json", JSON.stringify(myLocalStorage2));
   };
   render() {
     let divAlert = "";

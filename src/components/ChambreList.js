@@ -1,56 +1,39 @@
 import React from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
+
+// var data = require("./chambre.json");
+// localStorage.setItem("chambre.json", JSON.stringify(data));
 
 class ChambreList extends React.Component {
   constructor(props2) {
     super(props2);
     this.state = { items: [], checkdelete: false };
     this.deleteItem = this.deleteItem.bind(this);
-
-    // console.log(this.props2.match);
   }
+
   componentDidMount() {
-    axios
-      .get("https://62055a81161670001741b9aa.mockapi.io/chambre")
-      .then((response) => {
-        this.setState({ items: response.data });
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    let myLocalStorage = localStorage.getItem("chambre.json");
+    if (myLocalStorage !== null) {
+      this.setState({ items: JSON.parse(myLocalStorage) });
+    }
   }
 
   deleteItem(e) {
-    console.log(e.target.id);
-    // alert(e.target.innerHTML);
-
     const idChambre = e.target.id;
 
-    axios
-      .delete(
-        "https://62055a81161670001741b9aa.mockapi.io/chambre/" + idChambre
-      )
-      .then((response) => {
-        console.log(response);
-        let itemsUpadte = this.state.items.filter(function (item) {
-          return item.id != idChambre;
-        });
+    let itemsUpdate = this.state.items.filter(function (item) {
+      return item.id != idChambre;
+    });
 
-        this.state.items = itemsUpadte;
+    this.state.items = itemsUpdate;
 
-        // console.log(itemsUpadte);
-
-        if (response.status == 200) {
-          this.state.checkdelete = true;
-          this.setState(this.state);
-        }
-
-        console.log(this.state.checkdelete);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    try {
+      this.setState(this.state);
+      this.state.checkdelete = true;
+      localStorage.setItem("chambre.json", JSON.stringify(this.state.items));
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   render() {
